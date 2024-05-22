@@ -2,20 +2,26 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 
 	krakenapi "github.com/beldur/kraken-go-api-client"
 )
 
-func main() {
-	// Interval should be a string .
-	pair, interval := "ETH/USD", "240"
+func FetchPrices(pair string, interval int16) *krakenapi.OHLCResponse {
+	sinterval := strconv.Itoa(int(interval))
 	api := krakenapi.New("", "")
 
-	resp, err := api.OHLCWithInterval(pair, interval)
+	resp, err := api.OHLCWithInterval(pair, sinterval)
 
 	if err != nil {
-		println("Error getting ohlc data:")
+		println("Error getting ohlc data: %s", err)
 	}
+
+	return resp
+}
+
+func main() {
+	resp := FetchPrices("ETH/USD", 240)
 
 	for _, ohlc := range resp.OHLC {
 		fmt.Printf("\n\nTime: %v\n", ohlc.Time)
@@ -23,7 +29,5 @@ func main() {
 		fmt.Printf("High: %f\n", ohlc.High)
 		fmt.Printf("Low: %f\n", ohlc.Low)
 		fmt.Printf("Close: %f\n", ohlc.Close)
-
 	}
-
 }
